@@ -189,7 +189,7 @@ export class GenericFlexibleScraper {
     maxConcurrent = 2,
     minTime = 0,
     headless = 'new', // default to 'new' (puppeteer >= v19), or true/false
-    cookiesFile = null,
+    cookiesFile = '',
     proxyRevalidateMs = 60_000,
     healthCheckUrl = 'https://ipinfo.io/json',
     twoCaptchaApiKey = '',
@@ -264,95 +264,95 @@ export class GenericFlexibleScraper {
 
   /**
    * Initialize Puppeteer with proxy, cookies, and user agent configuration.
-   * @param {string} [domain] Optional domain to load cookies for during initialization
    */
-  async initialize(domain = null) {
+  async initialize() {
     try {
-      const isRunning = await isChromiumDebuggerRunning();
+      await this.checkDebuggerConnection();
+      await this.setupBrowser();
+      await this.setupPage();
       
-      if (!isRunning) {
-        console.log('No debuggable Chrome instance found.');
-        console.log('Please make sure Chrome is running with:');
-        console.log(`"${this.chromePath}" --remote-debugging-port=9222`);
-        throw new Error('No debuggable Chrome instance found');
-      }
-
-      try {
-        console.log('Connecting to existing Chrome instance with stealth...');
-        
-        // Use puppeteerExtra instead of puppeteer
-        this.browser = await this.puppeteer.connect({
-          browserURL: 'http://localhost:9222/json/version',
-          defaultViewport: null,
-          protocolTimeout: 0,
-        });
-
-        this.page = await this.browser.newPage();
-
-        // Additional stealth configurations
-        await this.page.evaluateOnNewDocument(() => {
-          // Overwrite the languages
-          Object.defineProperty(navigator, 'languages', {
-            get: () => ['fr-FR', 'fr', 'en-US', 'en'],
-          });
-
-          // Overwrite permissions
-          const originalQuery = window.navigator.permissions.query;
-          window.navigator.permissions.query = (parameters) => (
-            parameters.name === 'notifications' ?
-              Promise.resolve({ state: Notification.permission }) :
-              originalQuery(parameters)
-          );
-        });
-
-        console.log('Successfully connected with stealth mode');
-      } catch (e) {
-        console.error('Failed to connect:', e.message);
-        throw new Error('Could not connect to Chrome debugger. Please check if Chrome is running with debugging enabled.');
-      }
-      
-      // Set random user agent
-      const userAgent = getRandomUserAgent();
-      await this.page.setUserAgent(userAgent);
-
-      // Handle cookie management if cookieManager exists
+      // Load all cookies without filtering by domain
       if (this.cookieManager) {
-        if (domain) {
-          // Load domain-specific cookies if domain is provided
-          const domainCookies = this.cookieManager.getCookiesForDomain(domain);
-          if (domainCookies.length) {
-            await this.page.setCookie(...domainCookies);
-            console.log(`Loaded ${domainCookies.length} cookies for domain: ${domain}`);
-          }
-        } else {
-          // Load all available cookies if no specific domain
-          const allCookies = this.cookieManager.getAllCookies();
-          if (allCookies.length) {
-            await this.page.setCookie(...allCookies);
-            console.log(`Loaded ${allCookies.length} cookies from cookie manager`);
-          }
+        const cookies = await this.cookieManager.getAllCookies();
+        if (cookies.length > 0) {
+          await this.browser.setCookie(...cookies);
+          // Don't log specific cookie info
+          console.log('✅ Browser configured');
         }
-
-        // Set up cookie change listener to automatically save new cookies
-        this.page.on('response', async (response) => {
-          try {
-            const cookies = await this.page.cookies();
-            if (cookies.length) {
-              const responseDomain = new URL(response.url()).hostname;
-              this.cookieManager.mergeCookies(responseDomain, cookies);
-              await this.cookieManager.save();
-            }
-          } catch (error) {
-            console.warn('Error handling cookie update:', error);
-          }
-        });
       }
 
-      return this.page;
-    } catch (error) {
-      console.error('Initialization error:', error.message);
-      throw error;
+      await this.setupCookieHandling();
+      await this.setupStealthMode();
+      // await this.setupUserAgent();
+      
+      // Don't log initialization details
+      console.log('✅ Setup complete');
+    } catch (err) {
+      console.error('❌ Setup error:', err);
+      throw err;
     }
+  }
+
+  async checkDebuggerConnection() {
+    const isRunning = await isChromiumDebuggerRunning();
+    if (!isRunning) {
+      console.log('No debuggable Chrome instance found.');
+      console.log('Please make sure Chrome is running with:');
+      console.log(`"${this.chromePath}" --remote-debugging-port=9222`);
+      throw new Error('No debuggable Chrome instance found');
+    }
+  }
+
+  async setupBrowser() {
+    console.log('Connecting to existing Chrome instance with stealth...');
+    this.browser = await this.puppeteer.connect({
+      browserURL: 'http://localhost:9222/json/version',
+      defaultViewport: null,
+      protocolTimeout: 0,
+    });
+  }
+
+  async setupPage() {
+    this.page = await this.browser.newPage();
+  }
+
+  async setupCookieHandling() {
+    if (this.cookieManager) {
+        this.page.on('response', async (response) => {
+            try {
+                const cookies = response.headers()['set-cookie']; // Extract cookies from headers
+                if (cookies) { // Only update if cookies exist
+                    console.log(`🍪 Cookies found in response from ${response.url()}`);
+                    const parsedCookies = await this.browser.cookies();
+                    await this.cookieManager.updateCookies(parsedCookies);
+                }
+            } catch (error) {
+                console.warn('Error handling cookie update:', error);
+            }
+        });
+    }
+}
+
+  async setupStealthMode() {
+    await this.page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'languages', {
+        get: () => ['fr-FR', 'fr', 'en-US', 'en'],
+      });
+
+      const originalQuery = window.navigator.permissions.query;
+      window.navigator.permissions.query = (parameters) => (
+        parameters.name === 'notifications' ?
+          Promise.resolve({ state: Notification.permission }) :
+          originalQuery(parameters)
+      );
+    });
+    console.log('Stealth mode configured');
+  }
+
+  async setupUserAgent() {
+    const userAgent = getRandomUserAgent();
+    await this.page.setUserAgent(userAgent);
+    console.log('User agent configured');
   }
 
   /**
@@ -675,71 +675,48 @@ export class GenericFlexibleScraper {
    * Update concurrency, blocked resources, output file name, cookies, etc.
    */
   async handleConfigure(step) {
-    console.log('Running CONFIGURE step...');
+    const {
+      concurrency = 5,
+      blockedResources = [],
+      outputFileName = 'output.jsonl',
+      proxyRotation = false,
+      mouseMovements = true,
+      // ... other scraping-specific configs
+    } = step;
 
-    if (typeof step.concurrency === 'number') {
-      this.config.concurrency = step.concurrency;
-      this.limit = pLimit(step.concurrency);
-    } else {
-      // if no concurrency provided, default
-      this.limit = pLimit(this.config.concurrency);
-    }
-
-    if (Array.isArray(step.blockedResources)) {
-      this.config.blockedResources = step.blockedResources;
-    }
-
-    if (typeof step.outputFileName === 'string') {
-      this.config.outputFileName = step.outputFileName;
-    }
-
-    // Handle headless mode configuration
-    if (step.headless !== undefined) {
-      this.headlessMode = step.headless;
-      // If browser is already running, we need to restart it with new headless setting
-      if (this.browser) {
-        await this.browser.close();
-        this.browser = null;
-        this.page = null;
-        // Reinitialize with current domain if any
-        await this.initialize(step.domain);
+    try {
+      // Set concurrency limit
+      this.limit = pLimit(concurrency);
+      
+      // Configure resource blocking if needed
+      if (blockedResources.length > 0) {
+        await this.page.setRequestInterception(true);
+        this.page.on('request', (req) => {
+          if (blockedResources.includes(req.resourceType())) {
+            req.abort();
+          } else {
+            req.continue();
+          }
+        });
       }
-    }
 
-    // Handle cookie configuration
-    if (step.cookiesFile) {
-      // If cookieManager doesn't exist or has a different file, create/update it
-      if (!this.cookieManager || this.cookieManager.cookiesFile !== step.cookiesFile) {
-        this.cookieManager = new CookieManager(step.cookiesFile);
-        console.log(`Initialized cookie manager with file: ${step.cookiesFile}`);
-      }
-    }
+      // Configure output file
+      this.config.outputFileName = outputFileName;
+      
+      // Store other configurations
+      this.config = {
+        ...this.config,
+        concurrency,
+        blockedResources,
+        proxyRotation,
+        mouseMovements
+      };
 
-    // Handle domain configuration for cookies
-    if (step.domain && this.cookieManager) {
-      const domainCookies = this.cookieManager.getCookiesForDomain(step.domain);
-      if (domainCookies.length) {
-        await this.page.setCookie(...domainCookies);
-        console.log(`Loaded ${domainCookies.length} cookies for domain: ${step.domain}`);
-      }
+      console.log('✅ Scraping configuration complete');
+    } catch (err) {
+      console.error('❌ Configuration error:', err);
+      throw err;
     }
-
-    // (Re)Create a write stream if needed
-    if (this.writeStream) {
-      this.writeStream.end();
-    }
-    const outPath = path.resolve(process.cwd(), this.config.outputFileName);
-    this.writeStream = fs.createWriteStream(outPath, { flags: 'a' });
-    this.writeStream.on('error', (err) => console.error('Write Stream Error:', err));
-
-    console.log('Configuration updated:', {
-      ...this.config,
-      cookiesFile: step.cookiesFile,
-      domain: step.domain,
-      headless: this.headlessMode
-    });
-    
-    return "Done with the configuration";
   }
 
   /**
@@ -1029,76 +1006,113 @@ export class GenericFlexibleScraper {
    * Additional step: CLICK
    */
   async handleClick(step) {
-    const { selector, xpath, waitForNav = false, navigationTimeout = 60000 } = step;
-    const maxRetries = 3;
+    const { 
+      selector, 
+      xpath, 
+      waitForNav = false, 
+      navigationTimeout = 60000,
+      maxRetries = 3 
+    } = step;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        let element;
-        if (xpath) {
-          element = await this.page.waitForSelector(`::-p-xpath(${xpath})`, {
-            timeout: 5000
-          }).catch(() => null);
-        } else if (selector) {
-          element = await this.page.$(selector);
-        }
+        // Find and validate element
+        const element = await this.findClickableElement(selector, xpath);
+        
+        // Get element position and prepare for click
+        const clickPosition = await this.prepareElementForClick(element);
+        
+        // Perform the click
+        await this.executeClick(clickPosition.x, clickPosition.y);
 
-        if (!element) {
-          throw new ElementNotFoundError(selector, xpath);
-        }
-
-        // Get final position after scrolling
-        const box = await this.scrollElementIntoViewIfNeeded(element);
-
-        // Calculate click point using the updated position
-        const x = box.x + Math.random() * (box.width - 10);
-        const y = box.y + Math.random() * (box.height - 5);
-
-        // Move mouse and Click
-        console.log(`\n🖱️  Clicking at position: x=${Math.round(x)}, y=${Math.round(y)}`);
-        await this.moveMouseHumanlike(x, y);
-        await this.page.mouse.click(x, y);
-
+        // Handle navigation if needed
         if (waitForNav) {
-          try {
-            await Promise.race([
-              this.page.waitForNavigation({ 
-                waitUntil: 'networkidle2',
-                timeout: navigationTimeout 
-              }),
-              // Add a fallback promise that resolves after navigationTimeout
-              new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('NAVIGATION_TIMEOUT')), navigationTimeout)
-              )
-            ]);
-            return; // Success - exit the retry loop
-          } catch (navError) {
-            if (navError.message === 'NAVIGATION_TIMEOUT' || navError.name === 'TimeoutError') {
-              if (attempt === maxRetries) {
-                console.log('\n⚠️  Navigation failed after 3 attempts - continuing execution...');
-                await this.page.waitForTimeout(1000);
-                return;
-              }
-              console.log(`\n⚠️  Navigation timeout (attempt ${attempt}/${maxRetries}) - retrying...`);
-              await this.page.waitForTimeout(1000);
-              continue;
-            }
-            throw navError;
-          }
+          await this.handleNavigation(navigationTimeout, attempt, maxRetries);
         }
-        return; // Success if no navigation needed
+        
+        return; // Success - exit the retry loop
 
       } catch (err) {
-        if (err instanceof ElementNotFoundError) {
-          throw err; // Let this propagate up
-        }
-        if (attempt === maxRetries) {
-          throw err; // Let the final error propagate up
-        }
-        console.log(`\n⚠️  Click failed (attempt ${attempt}/${maxRetries}) - retrying...`);
-        await this.page.waitForTimeout(1000);
+        await this.handleClickError(err, attempt, maxRetries);
       }
     }
+  }
+
+  async findClickableElement(selector, xpath) {
+    const element = xpath ? 
+      await this.page.waitForSelector(`::-p-xpath(${xpath})`, { timeout: 5000 }) :
+      await this.page.$(selector);
+
+    if (!element) {
+      throw new ElementNotFoundError(selector, xpath);
+    }
+    return element;
+  }
+
+  async prepareElementForClick(element) {
+    const box = await this.scrollElementIntoViewIfNeeded(element);
+    return this.getPointPosition(box);
+  }
+
+  async executeClick(x, y) {
+    console.log(`\n🖱️  Clicking at position: x=${Math.round(x)}, y=${Math.round(y)}`);
+    await this.moveMouseHumanlike(x, y);
+    await this.page.mouse.click(x, y);
+  }
+
+  async handleNavigation(timeout, attempt, maxRetries) {
+    try {
+      await Promise.race([
+        this.page.waitForNavigation({ 
+          waitUntil: 'networkidle2',
+          timeout 
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('NAVIGATION_TIMEOUT')), timeout)
+        )
+      ]);
+    } catch (navError) {
+      if (navError.message === 'NAVIGATION_TIMEOUT' || navError.name === 'TimeoutError') {
+        if (attempt === maxRetries) {
+          console.log('\n⚠️  Navigation failed after all attempts - continuing execution...');
+          await this.page.waitForTimeout(1000);
+          return;
+        }
+        console.log(`\n⚠️  Navigation timeout (attempt ${attempt}/${maxRetries}) - retrying...`);
+        await this.page.waitForTimeout(1000);
+        throw navError; // Propagate to retry logic
+      }
+      throw navError;
+    }
+  }
+
+  async handleClickError(err, attempt, maxRetries) {
+    if (err instanceof ElementNotFoundError) {
+      throw err; // Let element not found errors propagate up
+    }
+    if (attempt === maxRetries) {
+      throw err; // Let the final error propagate up
+    }
+    console.log(`\n⚠️  Click failed (attempt ${attempt}/${maxRetries}) - retrying...`);
+    await this.page.waitForTimeout(1000);
+  }
+
+  // Rename the helper function
+  getPointPosition(box) {
+    // Find center point
+    const centerX = box.x + box.width / 2;
+    const centerY = box.y + box.height / 2;
+
+    // Calculate random offset from center (within 20% of dimensions)
+    const maxOffset = Math.min(box.width, box.height) * 0.2;
+    const offsetX = (Math.random() - 0.5) * maxOffset;
+    const offsetY = (Math.random() - 0.5) * maxOffset;
+
+    // Final coordinates (ensuring we stay within bounds)
+    const x = Math.min(Math.max(centerX + offsetX, box.x + 5), box.x + box.width - 5);
+    const y = Math.min(Math.max(centerY + offsetY, box.y + 5), box.y + box.height - 5);
+
+    return { x, y };
   }
 
   /**
@@ -1119,16 +1133,15 @@ export class GenericFlexibleScraper {
         }).catch(() => null);
 
         if (nextButton) {
-          // Get button position
-          const box = await nextButton.boundingBox();
+          // Get button position and scroll into view
+          const box = await this.scrollElementIntoViewIfNeeded(nextButton);
           if (box) {
-            // Calculate a random point within the button
-            const targetX = Math.round(box.x + box.width * (0.3 + Math.random() * 0.4));
-            const targetY = Math.round(box.y + box.height * (0.3 + Math.random() * 0.4));
+            // Get click point using the renamed helper function
+            const { x, y } = this.getPointPosition(box);
 
             // Move mouse to button with human-like movement
-            await this.moveMouseHumanlike(targetX, targetY, {
-              steps: Math.floor(Math.random() * 20) + 20, // 20-40 steps
+            await this.moveMouseHumanlike(x, y, {
+              steps: Math.floor(Math.random() * 20) + 20,
               minDelay: 20,
               maxDelay: 50,
               useBezier: true,
@@ -1138,7 +1151,8 @@ export class GenericFlexibleScraper {
             await randomDelay(50, 150);
 
             // Click and wait for navigation
-            await nextButton.click();
+            console.log(`\n🖱️  Clicking pagination at position: x=${Math.round(x)}, y=${Math.round(y)}`);
+            await this.page.mouse.click(x, y);
             await this.page.waitForNavigation({ waitUntil: 'networkidle2' });
 
             // Random delay between pages
@@ -1336,12 +1350,16 @@ export class GenericFlexibleScraper {
 
   async handleRandomMouseMovement(step) {
     const {
-      duration = 5000,  // Duration in milliseconds
+      duration = 5000,  // Base duration in milliseconds
       minDelay = 100,   // Minimum delay between movements
       maxDelay = 500,   // Maximum delay between movements
       margin = 100,     // Margin from page edges
     } = step;
 
+    // Calculate random duration within ±10% of specified duration
+    const variance = duration * 0.1; // 10% of duration
+    const randomDuration = duration + (Math.random() * variance * 2 - variance);
+    
     const startTime = Date.now();
 
     try {
@@ -1359,8 +1377,8 @@ export class GenericFlexibleScraper {
         )
       }));
 
-      // Keep moving until duration is reached
-      while (Date.now() - startTime < duration) {
+      // Keep moving until randomDuration is reached
+      while (Date.now() - startTime < randomDuration) {
         // Generate random target coordinates within viewport
         const targetX = Math.floor(Math.random() * (dimensions.width - 2 * margin) + margin);
         const targetY = Math.floor(Math.random() * (dimensions.height - 2 * margin) + margin);
@@ -1449,10 +1467,18 @@ export class GenericFlexibleScraper {
   // Add the step out window handler
   async handleStepOutWindow(step) {
     const {
-      duration = { min: 2000, max: 10000 },
+      duration = { min: 2000, max: 10000 },  // Base duration or range
       exitEdge = 'top',
       moveBackDelay = { min: 500, max: 2000 },
     } = step;
+
+    // If duration is a number, treat it as base duration and add ±10% variance
+    const baseDuration = typeof duration === 'number' ? duration : 
+      Math.floor(Math.random() * (duration.max - duration.min)) + duration.min;
+
+    // Calculate random duration within ±10% of base duration
+    const variance = baseDuration * 0.1;
+    const randomDuration = baseDuration + (Math.random() * variance * 2 - variance);
 
     try {
       // Get viewport dimensions
@@ -1488,10 +1514,9 @@ export class GenericFlexibleScraper {
         window.dispatchEvent(new Event('blur'));
       });
 
-      // Random delay outside the window
-      const timeOutside = Math.floor(Math.random() * (duration.max - duration.min)) + duration.min;
-      console.log(`Stepping out of window for ${timeOutside}ms`);
-      await new Promise(resolve => setTimeout(resolve, timeOutside));
+      // Use randomDuration instead of timeOutside
+      console.log(`Stepping out of window for ${Math.round(randomDuration)}ms`);
+      await new Promise(resolve => setTimeout(resolve, randomDuration));
 
       // Trigger focus event to "come back"
       await this.page.evaluate(() => {
@@ -1560,45 +1585,43 @@ export class GenericFlexibleScraper {
 
   // Add the new method
   async handleHumanLikeTextExtraction(step) {
-    const {
-      selector,
-      xpath,
-    } = step;
+    const { selector, xpath } = step;
 
     try {
       // Find the element
-      let element;
-      if (xpath) {
-        element = await this.page.waitForSelector(`::-p-xpath(${xpath})`, {
-          timeout: 5000
-        }).catch(() => null);
-      } else if (selector) {
-        element = await this.page.$(selector);
-      }
+      const element = xpath ? 
+        await this.page.waitForSelector(`::-p-xpath(${xpath})`, { timeout: 5000 }) :
+        await this.page.waitForSelector(selector, { timeout: 5000 });
 
       if (!element) {
         throw new ElementNotFoundError(selector, xpath);
       }
 
-      // Use new scroll function
-      await this.scrollElementIntoViewIfNeeded(element);
+      // Scroll element into view and get its position
+      const box = await this.scrollElementIntoViewIfNeeded(element);
+      
+      // Get the text content
+      const text = await this.page.evaluate(el => el.textContent, element);
 
-      // Get element position and dimensions
-      const box = await this.page.evaluate((el) => {
-        const rect = el.getBoundingClientRect();
-        return {
-          x: rect.x,
-          y: rect.y,
-          width: rect.width,
-          height: rect.height,
-          text: el.textContent
-        };
-      }, element);
+      // Simulate reading with mouse movements
+      const numPoints = Math.floor(text.length / 50) + 2; // One point per ~50 chars
+      const points = [];
 
-      // Wait for scroll
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Generate points along the text (left to right, top to bottom)
+      for (let i = 0; i < numPoints; i++) {
+        points.push({
+          x: box.x + (box.width * (i / (numPoints - 1))),
+          y: box.y + (box.height * 0.5 + (Math.random() - 0.5) * 10) // Small vertical variation
+        });
+      }
 
-      return box.text;
+      // Move through each point with human-like motion
+      for (const point of points) {
+        await this.moveMouseHumanlike(point.x, point.y);
+        await new Promise(resolve => setTimeout(resolve, Math.random() * 300 + 200));
+      }
+
+      return text;
 
     } catch (err) {
       if (err instanceof ElementNotFoundError) {
@@ -1612,50 +1635,47 @@ export class GenericFlexibleScraper {
 
   // Add the new method
   async handleInsertData(step) {
-    const {
-      selector,
-      xpath,
-      text,
-      charDelay = { min: 50, max: 250 },
-      pauseDelay = { min: 0, max: 200 },
-    } = step;
+    const { selector, xpath, text, randomDelay = { min: 100, max: 300 } } = step;
 
     try {
       // Find the element
-      let element;
-      if (xpath) {
-        element = await this.page.waitForSelector(`::-p-xpath(${xpath})`, {
-          timeout: 5000
-        }).catch(() => null);
-      } else if (selector) {
-        element = await this.page.$(selector);
-      }
+      const element = xpath ? 
+        await this.page.waitForSelector(`::-p-xpath(${xpath})`, { timeout: 5000 }) :
+        await this.page.waitForSelector(selector, { timeout: 5000 });
 
       if (!element) {
         throw new ElementNotFoundError(selector, xpath);
       }
 
-      // Click to focus the element
-      await element.click();
+      // Get element position and scroll into view
+      const box = await this.scrollElementIntoViewIfNeeded(element);
 
-      // Type each character with random delays
-      for (const char of text) {
-        // Random delay between keystrokes
-        const delay = Math.floor(Math.random() * (charDelay.max - charDelay.min)) + charDelay.min;
-        
-        // Type the character with delay
-        await this.page.keyboard.type(char, { delay });
+      // Get click position using our helper function
+      const { x, y } = this.getPointPosition(box);
 
-        // Additional random pause after each character
-        const pause = Math.floor(Math.random() * (pauseDelay.max - pauseDelay.min)) + pauseDelay.min;
-        await new Promise(resolve => setTimeout(resolve, pause));
-      }
+      // Move mouse to input field
+      console.log(`\n🖱️  Moving to input at position: x=${Math.round(x)}, y=${Math.round(y)}`);
+      await this.moveMouseHumanlike(x, y);
 
-      console.log(`Typed text: "${text}" with human-like delays`);
+      // Small delay before clicking
+      await new Promise(resolve => setTimeout(resolve, 
+        Math.floor(Math.random() * 200) + 100
+      ));
+
+      // Click the element
+      await this.page.mouse.click(x, y);
+
+      // Small delay before typing
+      await new Promise(resolve => setTimeout(resolve, 
+        Math.floor(Math.random() * randomDelay.max - randomDelay.min) + randomDelay.min
+      ));
+
+      // Type the text with random delays between keystrokes
+      await element.type(text, { delay: Math.floor(Math.random() * 100) + 50 });
 
     } catch (err) {
       if (err instanceof ElementNotFoundError) {
-        console.log('\nSmoothly stopping process:', err.message);
+        console.log('\nFailed to find input element:', err.message);
         throw err;
       }
       console.error('Error in text insertion:', err);
@@ -1821,35 +1841,35 @@ export class GenericFlexibleScraper {
 
           // Move mouse over item if enabled
         if (mouseMovement.enabled && box) {
-          // Calculate a few random points within the item to move to
+          // Calculate points using getPointPosition
           const points = [
-            { // Start near the top-left
-              x: box.x + box.width * 0.2 + Math.random() * 20,
-              y: box.y + box.height * 0.2 + Math.random() * 20
-            },
-            { // Middle point
-              x: box.x + box.width * 0.5 + (Math.random() - 0.5) * 40,
-              y: box.y + box.height * 0.5 + (Math.random() - 0.5) * 20
-            },
-            { // End near bottom-right
-              x: box.x + box.width * 0.8 + Math.random() * 20,
-              y: box.y + box.height * 0.8 + Math.random() * 20
-            }
+            this.getPointPosition({
+              x: box.x,
+              y: box.y,
+              width: box.width * 0.4,  // Use first 40% of box
+              height: box.height * 0.4
+            }),
+            this.getPointPosition({
+              x: box.x + box.width * 0.3,
+              y: box.y + box.height * 0.3,
+              width: box.width * 0.4,  // Use middle 40% of box
+              height: box.height * 0.4
+            }),
+            this.getPointPosition({
+              x: box.x + box.width * 0.6,
+              y: box.y + box.height * 0.6,
+              width: box.width * 0.4,  // Use last 40% of box
+              height: box.height * 0.4
+            })
           ];
 
           // Move through the points
           for (const point of points) {
-            await this.moveMouseHumanlike(point.x, point.y, {
-              steps: Math.floor(Math.random() * 15) + 10,
-              minDelay: 20,
-              maxDelay: 50
-            });
-
-            // Random hover time at each point
-            const hoverTime = Math.floor(Math.random() * 
-              (mouseMovement.hoverTime.max - mouseMovement.hoverTime.min)) + 
-              mouseMovement.hoverTime.min;
-            await new Promise(resolve => setTimeout(resolve, hoverTime));
+            await this.moveMouseHumanlike(point.x, point.y);
+            await new Promise(resolve => setTimeout(resolve, 
+              Math.random() * (mouseMovement.hoverTime.max - mouseMovement.hoverTime.min) + 
+              mouseMovement.hoverTime.min
+            ));
           }
         }
 
@@ -1968,17 +1988,34 @@ export class GenericFlexibleScraper {
         const box = await this.scrollElementIntoViewIfNeeded(item);
         
         if (mouseMovement.enabled && box) {
-          // Move mouse over item naturally
+          // Calculate points using getPointPosition
           const points = [
-            { x: box.x + box.width * 0.2 + Math.random() * 20, y: box.y + box.height * 0.2 + Math.random() * 20 },
-            { x: box.x + box.width * 0.5 + (Math.random() - 0.5) * 40, y: box.y + box.height * 0.5 + (Math.random() - 0.5) * 20 },
-            { x: box.x + box.width * 0.8 + Math.random() * 20, y: box.y + box.height * 0.8 + Math.random() * 20 }
+            this.getPointPosition({
+              x: box.x,
+              y: box.y,
+              width: box.width * 0.4,  // Use first 40% of box
+              height: box.height * 0.4
+            }),
+            this.getPointPosition({
+              x: box.x + box.width * 0.3,
+              y: box.y + box.height * 0.3,
+              width: box.width * 0.4,  // Use middle 40% of box
+              height: box.height * 0.4
+            }),
+            this.getPointPosition({
+              x: box.x + box.width * 0.6,
+              y: box.y + box.height * 0.6,
+              width: box.width * 0.4,  // Use last 40% of box
+              height: box.height * 0.4
+            })
           ];
 
+          // Move through the points
           for (const point of points) {
             await this.moveMouseHumanlike(point.x, point.y);
             await new Promise(resolve => setTimeout(resolve, 
-              Math.random() * (mouseMovement.hoverTime.max - mouseMovement.hoverTime.min) + mouseMovement.hoverTime.min
+              Math.random() * (mouseMovement.hoverTime.max - mouseMovement.hoverTime.min) + 
+              mouseMovement.hoverTime.min
             ));
           }
         }
@@ -1987,20 +2024,29 @@ export class GenericFlexibleScraper {
         const itemResults = {};
         for (const subStep of normalizedSteps) {
           try {
-            // Modify the step to use the current item's XPath as base
-            const modifiedStep = {
-              ...subStep,
-              xpath: subStep.xpath ? `${currentItemXPath}/${subStep.xpath.replace('./', '')}` : undefined,
-              selector: subStep.selector
-            };
+            const modifiedStep = { ...subStep };
 
-            // Handle EXTRACT type specially
             if (subStep.type === STEP_TYPES.EXTRACT && subStep.extracts) {
+              // Handle EXTRACT type with multiple selectors/xpaths
               modifiedStep.extracts = subStep.extracts.map(extract => ({
                 ...extract,
-                xpath: extract.xpath ? `${currentItemXPath}/${extract.xpath.replace('./', '')}` : extract.xpath
+                // If xpath is provided, make it relative to current item
+                xpath: extract.xpath ? `${currentItemXPath}/${extract.xpath.replace('./', '')}` : undefined,
+                // If selector is provided, scope it to current item
+                selector: extract.selector ? `[data-item-index="${i}"] ${extract.selector}` : undefined
               }));
+            } else {
+              // Handle regular xpath/selector properties
+              modifiedStep.xpath = subStep.xpath ? 
+                `${currentItemXPath}/${subStep.xpath.replace('./', '')}` : undefined;
+              modifiedStep.selector = subStep.selector ? 
+                `[data-item-index="${i}"] ${subStep.selector}` : undefined;
             }
+
+            // Add data-item-index to the current item for selector scoping
+            await this.page.evaluate((itemEl, index) => {
+              itemEl.setAttribute('data-item-index', index);
+            }, item, i);
 
             const result = await this.executeStep(modifiedStep);
             if (result != null) {
@@ -2010,6 +2056,7 @@ export class GenericFlexibleScraper {
             console.log(`Warning: Step ${subStep.type} failed for item ${i + 1}:`, stepErr.message);
           }
         }
+        
 
         results.push(itemResults);
 
@@ -2044,17 +2091,32 @@ export class GenericFlexibleScraper {
       const preDelay = Math.floor(Math.random() * (randomDelay.max - randomDelay.min)) + randomDelay.min;
       await new Promise(resolve => setTimeout(resolve, preDelay));
 
+      // Save current cookies
+      console.log('📝 Saving cookies...');
+      const cookies = await this.page.cookies();
+
       // Refresh the page
-      await Promise.all([
-        this.page.waitForNavigation({ waitUntil, timeout }),
-        this.page.reload({ waitUntil, timeout })
-      ]);
+      await this.page.reload({ waitUntil, timeout });
+
+      // Restore cookies using evaluate for better performance
+      console.log('🔄 Restoring cookies...');
+      await this.page.evaluate((cookiesArray) => {
+        cookiesArray.forEach(cookie => {
+          document.cookie = `${cookie.name}=${cookie.value}`;
+        });
+      }, cookies);
+
+      // Wait for navigation to complete
+      await this.page.waitForNavigation({ 
+        waitUntil, 
+        timeout 
+      }).catch(() => console.log('Navigation timeout - continuing...'));
 
       // Random delay after refresh
       const postDelay = Math.floor(Math.random() * (randomDelay.max - randomDelay.min)) + randomDelay.min;
       await new Promise(resolve => setTimeout(resolve, postDelay));
 
-      console.log('✅ Page refreshed successfully');
+      console.log('✅ Page refreshed successfully with cookies preserved');
       
     } catch (err) {
       if (err.name === 'TimeoutError') {

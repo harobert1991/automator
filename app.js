@@ -5,7 +5,7 @@ import connectDB from './config/database.js';
 import logger from './utils/appUtils/logger.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-import runProcess4 from './services/scrapers/process4.js';
+import runProcess6 from './services/scrapers/process6.js';
 
 // Importer les routes générées
 import scraperRoutes from './routes/scraperRoutes.js';
@@ -44,7 +44,7 @@ app.use('/scraper', scraperRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 
-runProcess4();
+runProcess6();
 
 
 // Route par défaut

@@ -64,37 +64,37 @@ async function runProcess3() {
         margin: 100,           // Stay 100px away from edges
       },
       // Click the search box
-      {
-        type: STEP_TYPES.INSERT_DATA_IN_SEARCH_BAR,
-        xpath: '/html/body/div[1]/div/div/div[2]/main/div/div/div/div[2]/div/div[2]/div/div/div/div/div[1]/div/div/div/form/div[1]/div/div/div/div/div[2]/div/input',
-        text: '@Contrarian888',
-        clickDelay: { min: 1000, max: 3000 },
-        charDelay: { min: 50, max: 250 },
-        pauseDelay: { min: 0, max: 200 },
-        enterDelay: { min: 100, max: 300 },
-        enterHoldDuration: { min: 50, max: 150 },
-        humanize: true
-      },
-      // More random movements
       // {
-      //   type: STEP_TYPES.RANDOM_MOUSE_MOVEMENT,
-      //   duration: 2000,  // 2 seconds of random movement
-      // }
-      // Click search button
-      {
-        type: STEP_TYPES.STEP_OUT_WINDOW,
-        duration: { min: 3000, max: 8000 },  // Stay "outside" for 3-8 seconds
-        moveBackDelay: { min: 500, max: 1500 }  // Wait 0.5-1.5s before moving mouse back
-      },
-      {
-        type: STEP_TYPES.HUMAN_LIKE_TEXT_EXTRACTION,
-        xpath: '//div[@class="tweet-text"]',
-        moveDelay: { min: 800, max: 2000 },
-        holdDelay: { min: 150, max: 400 },
-        dragSpeed: { min: 300, max: 1000 },
-        copyDelay: { min: 200, max: 500 },
-        humanize: true
-      },
+      //   type: STEP_TYPES.INSERT_DATA_IN_SEARCH_BAR,
+      //   xpath: '/html/body/div[1]/div/div/div[2]/main/div/div/div/div[2]/div/div[2]/div/div/div/div/div[1]/div/div/div/form/div[1]/div/div/div/div/div[2]/div/input',
+      //   text: '@Contrarian888',
+      //   clickDelay: { min: 1000, max: 3000 },
+      //   charDelay: { min: 50, max: 250 },
+      //   pauseDelay: { min: 0, max: 200 },
+      //   enterDelay: { min: 100, max: 300 },
+      //   enterHoldDuration: { min: 50, max: 150 },
+      //   humanize: true
+      // },
+      // // More random movements
+      // // {
+      // //   type: STEP_TYPES.RANDOM_MOUSE_MOVEMENT,
+      // //   duration: 2000,  // 2 seconds of random movement
+      // // }
+      // // Click search button
+      // {
+      //   type: STEP_TYPES.STEP_OUT_WINDOW,
+      //   duration: { min: 3000, max: 8000 },  // Stay "outside" for 3-8 seconds
+      //   moveBackDelay: { min: 500, max: 1500 }  // Wait 0.5-1.5s before moving mouse back
+      // },
+      // {
+      //   type: STEP_TYPES.HUMAN_LIKE_TEXT_EXTRACTION,
+      //   xpath: '//div[@class="tweet-text"]',
+      //   moveDelay: { min: 800, max: 2000 },
+      //   holdDelay: { min: 150, max: 400 },
+      //   dragSpeed: { min: 300, max: 1000 },
+      //   copyDelay: { min: 200, max: 500 },
+      //   humanize: true
+      // },
     ];
 
     await scraper.runSteps(steps);

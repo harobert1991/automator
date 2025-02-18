@@ -221,3 +221,117 @@
 {"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 07:51:44"}
 {"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 07:52:18"}
 {"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 07:52:18"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 08:56:41"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 08:56:42"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 09:42:12"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 09:42:12"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 10:03:14"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 10:03:14"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 10:03:47"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 10:03:47"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 10:05:43"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 10:05:50"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:21:45"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:21:45"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:24:56"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:24:57"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:26:25"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:26:25"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:26:39"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:26:39"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:27:34"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:27:37"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:32:12"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:32:12"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:37:48"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:37:48"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:39:59"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:40:00"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:47:38"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:47:39"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:58:09"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:58:09"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 11:58:48"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 11:58:48"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:01:25"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:01:25"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:03:50"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:03:50"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:07:42"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:07:42"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:09:06"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:09:07"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:09:58"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:09:58"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:10:41"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:10:42"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:18:00"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:18:01"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:22:50"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:22:50"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:39:00"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:39:01"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:54:08"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:54:08"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 12:55:40"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 12:55:40"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:11:33"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:11:34"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:18:05"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:18:56"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:18:57"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:29:47"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:31:01"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:31:02"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:35:24"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:35:24"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:37:34"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:37:35"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:41:10"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:41:55"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:45:42"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:45:43"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:48:41"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:49:14"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:52:26"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:52:26"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:53:34"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:53:39"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:56:01"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:56:08"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:57:37"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:57:54"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:59:25"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:59:34"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 13:59:46"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 13:59:54"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 14:16:55"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 14:16:56"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 15:58:35"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 15:58:35"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 15:59:25"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 15:59:26"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:01:26"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:01:48"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:07:31"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:07:35"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:20:34"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:20:34"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:21:04"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-02.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:21:04"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:21:58"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:22:07"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:30:53"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:30:54"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:37:38"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:37:39"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:38:37"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:38:38"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:44:12"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:44:12"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 16:48:42"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-00.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 16:48:42"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 17:04:58"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 17:04:59"}
+{"level":"info","message":"Serveur démarré sur le port 3000","service":"starter-service","timestamp":"2025-02-18 17:30:24"}
+{"level":"info","message":"MongoDB Connected: cluster0-shard-00-01.njptj.mongodb.net","service":"starter-service","timestamp":"2025-02-18 17:30:24"}

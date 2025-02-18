@@ -59,65 +59,44 @@ async function runProcess4() {
       },
       {
         type: STEP_TYPES.NAVIGATE,
-        url: 'https://www.colruyt.be/fr/producten?searchTerm=legume&o=homepage&suggestion=none&type=product&method=user+typed&page=1',
+        url: 'https://www.linkedin.com/sales/search/people',
         randomDelay: { min: 4000, max: 10000 },
       },
-      // {
-      //   type: STEP_TYPES.REFRESH_PAGE,
-      //   waitUntil: 'networkidle2',
-      //   timeout: 30000,
-      //   randomDelay: {
-      //     min: 1000,
-      //     max: 3000
-      //   }
-      // },
-      // {
-      //   type: STEP_TYPES.DEBUG_MOUSE,
-      //   enabled: true,
-      //   startPosition: { x: 200, y: 200 },
-      //   rectangleColor: 'rgba(0, 255, 0, 0.3)',
-      // },
       // Add random mouse movements
-      {
-        type: STEP_TYPES.RANDOM_MOUSE_MOVEMENT,
-        duration: 3000,        // Move randomly for 3 seconds
-        minDelay: 100,         // Min delay between movements
-        maxDelay: 500,         // Max delay between movements
-        margin: 100,           // Stay 100px away from edges
-      },
-      // // Click the search box
       // {
-      //   type: STEP_TYPES.STEP_OUT_WINDOW,
-      //   duration: { min: 3000, max: 8000 },  // Stay "outside" for 3-8 seconds
-      //   moveBackDelay: { min: 500, max: 1500 }  // Wait 0.5-1.5s before moving mouse back
+      //   type: STEP_TYPES.RANDOM_MOUSE_MOVEMENT,
+      //   duration: 3000,        // Move randomly for 3 seconds
+      //   minDelay: 100,         // Min delay between movements
+      //   maxDelay: 500,         // Max delay between movements
+      //   margin: 100,           // Stay 100px away from edges
       // },
-      {
-        type: STEP_TYPES.LIST_LOOP,
-        listXPath: '/html/body/div[2]/main/div/div[6]/div/div/div/div[1]/div[1]/div/div[5]/div/div[2]/div[2]/div/div',
-        itemXPath: '/a',
-        stepsPerItem: [
-          {
-            type: STEP_TYPES.EXTRACT,
-            extracts: [
-              {
-                variableName: 'productName',
-                xpath: '/html/body/div[2]/main/div/div[6]/div/div/div/div[1]/div[1]/div/div[5]/div/div[2]/div[2]/div/div/a[1]/div[3]/div[1]/p[1]',
-                attribute: 'innerText'
-              }
-            ]
-          },
-          {
-            type: STEP_TYPES.CLICK,
-            xpath: '/html/body/div[2]/main/div/div[6]/div/div/div/div[1]/div[1]/div/div[5]/div/div[2]/div[2]/div/div/a[1]/div[3]/div[2]/div[2]/button[2]',
-            waitForNav: false
-          }
-        ],
-        mouseMovement: {
-          enabled: true,
-          hoverTime: { min: 300, max: 1000 }
-        },
-        randomDelay: { min: 800, max: 2000 }
-      },
+      // {
+      //   type: STEP_TYPES.LIST_LOOP,
+      //   listXPath: '/html/body/div[2]/main/div/div[6]/div/div/div/div[1]/div[1]/div/div[5]/div/div[2]/div[2]/div/div',
+      //   itemXPath: '/a',
+      //   stepsPerItem: [
+      //     {
+      //       type: STEP_TYPES.EXTRACT,
+      //       extracts: [
+      //         {
+      //           variableName: 'productName',
+      //           selector: 'p.card__text',
+      //           attribute: 'innerText'
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       type: STEP_TYPES.CLICK,
+      //       selector: 'button.action.action--add',
+      //       waitForNav: false
+      //     }
+      //   ],
+      //   mouseMovement: {
+      //     enabled: true,
+      //     hoverTime: { min: 300, max: 1000 }
+      //   },
+      //   randomDelay: { min: 800, max: 2000 }
+      // },
     ];
 
     const results = await scraper.runSteps(steps);

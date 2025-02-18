@@ -1,57 +1,59 @@
 // scrapers/cookieManager.js
-import fs from 'fs';
+import fs from 'fs/promises';
+import path from 'path';
 
 export class CookieManager {
-  constructor(filePath) {
-    this.filePath = filePath;
-    this.cookieJar = {}; // { domain: [ cookieObj, ... ] }
-    this.load();
+  constructor(cookiesFile) {
+    this.cookiesFile = cookiesFile;
   }
 
-  load() {
-    if (!this.filePath || !fs.existsSync(this.filePath)) return;
+  async getAllCookies() {
     try {
-      const raw = fs.readFileSync(this.filePath, 'utf-8');
-      const data = JSON.parse(raw);
-      this.cookieJar = data;
-      console.log(`Loaded cookies from ${this.filePath}`);
+      const data = await fs.readFile(this.cookiesFile, 'utf8');
+      return JSON.parse(data);
     } catch (err) {
-      console.error('Failed to load cookies:', err);
+      console.error('Error reading cookies file:', err.message);
+      return [];
     }
   }
 
-  save() {
-    if (!this.filePath) return;
+  async getCookiesForDomain(domain) {
+    const allCookies = await this.getAllCookies();
+    return allCookies.filter(cookie => cookie.domain === domain);
+  }
+
+  async saveCookies(cookies) {
     try {
-      fs.writeFileSync(this.filePath, JSON.stringify(this.cookieJar, null, 2), 'utf-8');
-      console.log(`Cookies saved: ${this.filePath}`);
+      await fs.writeFile(
+        this.cookiesFile,
+        JSON.stringify(cookies, null, 2),
+        'utf8'
+      );
     } catch (err) {
-      console.error('Failed to save cookies:', err);
+      console.error('Error saving cookies:', err.message);
     }
   }
 
-  /**
-   * Merges new cookies from a single domain
-   */
-  mergeCookies(domain, newCookies) {
-    if (!this.cookieJar[domain]) {
-      this.cookieJar[domain] = [];
-    }
-    // Overwrite or add new
-    newCookies.forEach((nc) => {
-      const idx = this.cookieJar[domain].findIndex((c) => c.name === nc.name && c.path === nc.path);
-      if (idx >= 0) {
-        this.cookieJar[domain][idx] = nc; // Update existing
-      } else {
-        this.cookieJar[domain].push(nc);
+  async updateCookies(newCookies) {
+    try {
+      const existingCookies = await this.getAllCookies();
+      
+      // Update or add new cookies
+      for (const newCookie of newCookies) {
+        const index = existingCookies.findIndex(
+          c => c.name === newCookie.name && c.domain === newCookie.domain
+        );
+        
+        if (index !== -1) {
+          existingCookies[index] = newCookie;
+        } else {
+          existingCookies.push(newCookie);
+        }
       }
-    });
-  }
 
-  /**
-   * Get cookies for a domain (fuzzy domain matching if needed)
-   */
-  getCookiesForDomain(domain) {
-    return this.cookieJar[domain] || [];
+      await this.saveCookies(existingCookies);
+    } catch (err) {
+      console.error('Error updating cookies:', err.message);
+    }
   }
 }
